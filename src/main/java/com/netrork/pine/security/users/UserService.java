@@ -15,16 +15,19 @@ public class UserService {
     public void saveUser(User user){
         userRepository.save( user);
     }
+    public Optional<User> findByUsername(String username){
+        return userRepository.findByUsername(username);
+    }
+
     public String findAndReturnUsernameOnly(String username){
-        return userRepository.findAndReturnUsernameOnly(username)
-                .orElseThrow(()-> new UsernameNotFoundException("Username not found"));
+        return userRepository.findAndReturnUsernameOnly(username);
     }
 
     public long findUserIdByUsername(String username){
         return userRepository.findUserIdByUsername(username);
     }
 
-    public String findUsernameById(Optional<Long> id){
+    public String findUsernameById(long id){
         return userRepository.findUsernameById(id);
     }
 
@@ -32,7 +35,7 @@ public class UserService {
         return userRepository.findUserRoleByUsername(username);
     }
 
-    public String findUserRoleByUserId(Optional<Long> id){
+    public String findUserRoleByUserId(long id){
         return userRepository.findUserRoleByUserId(id);
     }
 

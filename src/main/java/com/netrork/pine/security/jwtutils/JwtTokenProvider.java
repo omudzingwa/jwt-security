@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,9 +38,9 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createAccessToken(Optional<Long> user_id, String username, Role role){
+    public String createAccessToken(long id, String username, Role role){
         Claims claims = Jwts.claims().subject(username)
-                .add("user_id",user_id)
+                .add("id",id)
                 .add("scope","access")
                 .add("role",role.name())
                 .build();
@@ -91,8 +92,8 @@ public class JwtTokenProvider {
         //Validate the Refresh Token by checking if the token belongs to user, if the token exists and if the token has not expired
 
         //1 - Get user_id from refresh_token
-        Optional<Long> userId = refreshTokenService.findUserIdFromTokenByTokenValue(refresh_token);
-        if(userId.isEmpty()){
+        Long userId = refreshTokenService.findUserIdFromTokenByTokenValue(refresh_token);
+        if(userId==null){
             throw new RuntimeException("User Id for token supplied refresh token not found");
         }
 

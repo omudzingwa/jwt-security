@@ -20,11 +20,11 @@ public class RefreshTokenService {
         return refreshTokenRepository.findTokenByUserId(user_id);
     }
 
-    public Optional<Long> findUserIdFromTokenByTokenValue(String token){
+    public long findUserIdFromTokenByTokenValue(String token){
         return refreshTokenRepository.findUserIdFromTokenByTokenValue(token);
     }
 
-    public String getUsernameForTokenByUserId(Optional<Long> user_id){
+    public String getUsernameForTokenByUserId(long user_id){
         return refreshTokenRepository.getUsernameForTokenByUserId(user_id);
     }
 

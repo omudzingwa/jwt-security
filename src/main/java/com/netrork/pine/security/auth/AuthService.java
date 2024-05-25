@@ -38,7 +38,7 @@ public class AuthService {
     public void registerUser(RegisterRequest registerRequest){
 
         //1 - Check if username already exists or not
-        Optional<User> userToCheck = userRepository.findUserByUsername(registerRequest.getUsername());
+        Optional<User> userToCheck = userRepository.findByUsername(registerRequest.getUsername());
 
         if(userToCheck.isPresent()){
             throw new RuntimeException(userToCheck + " : Username already exists, kindly find another name to use");
@@ -80,12 +80,15 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String username = loginRequest.getUsername();
+        String username = userRepository.findAndReturnUsernameOnly(loginRequest.getUsername());
         long user_id = userService.findUserIdByUsername(username);
+        log.info("User_id at login is : " + user_id);
 
-        String role = userService.findUserRoleByUserId(Optional.of(user_id));
+        String role = userService.findUserRoleByUserId(userId);
 
-        String access_token = jwtTokenProvider.createAccessToken(Optional.of(user_id),username, Role.valueOf(role));
+
+        String access_token = jwtTokenProvider.createAccessToken(user_id,username,Role.valueOf(role));
+        //String access_token = jwtTokenProvider.createAccessToken(Optional.of(user_id),username, Role.valueOf(role));
         String refresh_token = jwtTokenProvider.createRefreshToken(user_id).getRefresh_token();
 
         return LoginResponse.builder()
@@ -105,11 +108,11 @@ public class AuthService {
 
         String refresh_token = newAccessTokenRequest.getRefresh_token();
         //Get user_id from refresh token
-        Optional<Long> refreshTokenUserId = refreshTokenService.findUserIdFromTokenByTokenValue(refresh_token);
-        if(refreshTokenUserId.isPresent()){
+        long refreshTokenUserId = refreshTokenService.findUserIdFromTokenByTokenValue(refresh_token);
+        if(refreshTokenUserId>0){
             //Use the user_id to get the matching username
             String username = userService.findUsernameById(refreshTokenUserId);
-            //Create the user details object to be used to chech if the token belong to the user during creating of new AccessToken
+            //Create the user details object to be used to check if the token belong to the user during creating of new AccessToken
             UserDetails userDetails = ourUserDetailsService.loadUserByUsername(username);
             //With all details set proceed to create the new AccessToken
             String access_token = jwtTokenProvider.regenerateAccessToken(newAccessTokenRequest.getRefresh_token(),userDetails);

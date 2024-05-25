@@ -19,10 +19,10 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken,Long>
     Optional<String> findTokenByUserId(Optional<Long> user_id);
 
     @Query(value = "select  user_id from refresh_tokens where refresh_token = ?1", nativeQuery = true)
-    Optional<Long> findUserIdFromTokenByTokenValue(String token);
+    long findUserIdFromTokenByTokenValue(String token);
 
     @Query(value = "select u.username from users u inner join refresh_tokens rt on rt.user_id=u.id", nativeQuery = true)
-    String getUsernameForTokenByUserId(Optional<Long> user_id);
+    String getUsernameForTokenByUserId(long user_id);
 
     @Query(value = "select expiry_date from refresh_tokens where refresh_token = ?1", nativeQuery = true)
     Date getExpiryDateFromRefreshToken(String refresh_token);
