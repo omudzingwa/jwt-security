@@ -7,13 +7,16 @@ import com.netrork.pine.security.roles.Role;
 import com.netrork.pine.security.users.UserService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Objects;
@@ -22,6 +25,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
@@ -33,7 +37,7 @@ public class JwtTokenProvider {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
 
-    private SecretKey secretKey(){
+    private SecretKey getSigningKey(){
         byte[] keyBytes = Decoders.BASE64.decode(encodedString);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -55,7 +59,7 @@ public class JwtTokenProvider {
                 .claims(claims)
                 .issuedAt(new Date(now.getTime()))
                 .expiration(new Date(System.currentTimeMillis()+accessTokenValidityTime))
-                .signWith(secretKey())
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -121,7 +125,7 @@ public class JwtTokenProvider {
 
     public String getUsernameFromToken(String token){
         return Jwts.parser()
-                .verifyWith(secretKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -130,7 +134,7 @@ public class JwtTokenProvider {
 
     Date getExpiryDateFromToken(String token){
         return Jwts.parser()
-                .verifyWith(secretKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -139,17 +143,25 @@ public class JwtTokenProvider {
 
     public boolean isTokenValid(String token, UserDetails userDetails){
         String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        log.info("JwtTokenProvider: IsTokenValid Method username is : " + username);
+        log.info("JwtTokenProvider: IsTokenValid Method userDetails username is : "+ userDetails.getUsername());
+        log.info("The statement that isTokenExpired =" + isTokenExpired(token));
+        //return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        if(username.equals(userDetails.getUsername()) && !isTokenExpired(token)){
+            return true;
+        }
+        return false;
     }
 
     public boolean isTokenExpired(String token){
         Date expirydate = Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getExpiration();
 
-        if(expirydate.before(new Date(System.currentTimeMillis()))){
+        if(expirydate.after(new Date(System.currentTimeMillis()))){
             return false;
         }
         else return true;
@@ -157,7 +169,7 @@ public class JwtTokenProvider {
 
     public long getUserIdFromToken(String token) {
         return Jwts.parser()
-                .verifyWith(secretKey())
+                .verifyWith((SecretKey) getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -168,7 +180,7 @@ public class JwtTokenProvider {
     public boolean isAccessTokenValid(String token) throws Exception {
         try {
             Jwts.parser()
-                    .verifyWith(secretKey())
+                    .verifyWith((SecretKey) getSigningKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();

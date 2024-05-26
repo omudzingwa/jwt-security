@@ -9,6 +9,9 @@ import com.netrork.pine.security.userdetails.OurUserDetailsService;
 import com.netrork.pine.security.users.User;
 import com.netrork.pine.security.users.UserRepository;
 import com.netrork.pine.security.users.UserService;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Encoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.util.Optional;
 
 @Service
@@ -55,6 +59,8 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
+
 
     }
 
