@@ -30,6 +30,7 @@ public class CustomLogoutHandler implements LogoutHandler {
         log.info("Fetching token from Database");
         String tokenFromDatabase = refreshTokenService.findTokenByValue(token)
                 .orElseThrow(()-> new RuntimeException("Token not found"));
+
         log.info("Token from Database is : " + tokenFromDatabase);
         log.info("Token from Request  is : " + token);
 

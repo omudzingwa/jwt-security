@@ -41,7 +41,6 @@ public class AppConfig {
         return config.getAuthenticationManager();
     }
 
-
     @Bean
     public SecurityContextHolderAwareRequestFilter securityContextHolderAwareRequestFilter() {
         return new SecurityContextHolderAwareRequestFilter();
