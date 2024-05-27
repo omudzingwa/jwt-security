@@ -33,13 +33,14 @@ public class CustomLogoutHandler implements LogoutHandler {
 
         //1 - Check if token exists in database
         if(token.equals(tokenFromDatabase)){
+            long userId=refreshTokenService.findUserIdFromTokenByTokenValue(token);
+            String username= refreshTokenService.getUsernameForTokenByUserId(userId);
             refreshTokenService.deleteTokenByTokenValue(token);
+            log.info("Deleted Refresh token for user : " + username);
             SecurityContextHolder.clearContext();
             try {
                 request.logout();
-                long userId=refreshTokenService.findUserIdFromTokenByTokenValue(token);
-                String username= refreshTokenService.getUsernameForTokenByUserId(userId);
-                log.info("Logged out user : " + username);
+                log.info("Logged out User : " + username);
 
             } catch (ServletException e) {
                 throw new RuntimeException(e);
