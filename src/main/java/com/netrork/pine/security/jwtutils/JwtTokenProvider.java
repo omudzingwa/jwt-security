@@ -30,8 +30,8 @@ public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String encodedString;
-    private final long accessTokenValidityTime = Duration.ofMinutes(2).toMillis();
-    private final long refreshTokenValidityTime = Duration.ofMinutes(4).toMillis();
+    private final long accessTokenValidityTime = Duration.ofMinutes(10).toMillis();
+    private final long refreshTokenValidityTime = Duration.ofMinutes(30).toMillis();
 
     private final UserService userService;
     private final RefreshTokenRepository refreshTokenRepository;

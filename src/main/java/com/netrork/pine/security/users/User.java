@@ -3,6 +3,7 @@ package com.netrork.pine.security.users;
 import com.netrork.pine.security.departments.Department;
 import com.netrork.pine.security.roles.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,7 +22,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -33,6 +35,7 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
     @Column(name = "email", unique = true)
+    @Email
     private String email;
     @Enumerated(EnumType.STRING)
     @Column(name = "department")
@@ -44,6 +47,10 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
+/*        if (this.role == Role.ADMIN) {
+            return List.of(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("USER"));
+        }
+        return List.of(new SimpleGrantedAuthority("USER"));*/
     }
 
     @Override

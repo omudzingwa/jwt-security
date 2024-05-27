@@ -1,12 +1,14 @@
 package com.netrork.pine.security.jwtutils;
 
 import com.netrork.pine.security.userdetails.OurUserDetailsService;
+import com.netrork.pine.security.users.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final OurUserDetailsService ourUserDetailsService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -40,9 +43,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken = authHeader.substring(7);
         String username = jwtTokenProvider.getUsernameFromToken(jwtToken);
 
+        //Check if the user has a refresh_token in database and if yes check if the refreshToken is valid
+
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
 
             UserDetails userDetails = ourUserDetailsService.loadUserByUsername(username);
+
             log.info("is the token valid = "+ jwtTokenProvider.isTokenValid(jwtToken,userDetails));
 
             if(jwtTokenProvider.isTokenValid(jwtToken,userDetails)){
