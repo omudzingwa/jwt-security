@@ -2,16 +2,12 @@ package com.netrork.pine.security.auth;
 
 import com.netrork.pine.security.departments.Department;
 import com.netrork.pine.security.jwtutils.JwtTokenProvider;
-import com.netrork.pine.security.refreshtokens.RefreshToken;
 import com.netrork.pine.security.refreshtokens.RefreshTokenService;
 import com.netrork.pine.security.roles.Role;
-import com.netrork.pine.security.userdetails.OurUserDetailsService;
+import com.netrork.pine.security.userdetails.UserDetailsServiceImpl;
 import com.netrork.pine.security.users.User;
 import com.netrork.pine.security.users.UserRepository;
 import com.netrork.pine.security.users.UserService;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +19,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.util.Optional;
 
 @Service
@@ -37,7 +32,7 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
-    private final OurUserDetailsService ourUserDetailsService;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
 
     public void registerUser(RegisterRequest registerRequest){
 
@@ -119,7 +114,7 @@ public class AuthService {
             //Use the user_id to get the matching username
             String username = userService.findUsernameById(refreshTokenUserId);
             //Create the user details object to be used to check if the token belong to the user during creating of new AccessToken
-            UserDetails userDetails = ourUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
             //With all details set proceed to create the new AccessToken
             String access_token = jwtTokenProvider.regenerateAccessToken(newAccessTokenRequest.getRefresh_token(),userDetails);
 

@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/endpoints")
 public class EndPoints {
 
-    @PreAuthorize("hasAuthority('USER')")
+    //@PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/user")
     public String ordinaryUsersOnly(){
         return "Ordinary users only";

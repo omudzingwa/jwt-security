@@ -1,6 +1,7 @@
 package com.netrork.pine.security.configs;
 
-import com.netrork.pine.security.userdetails.OurUserDetailsService;
+//import com.netrork.pine.security.userdetails.OurUserDetailsService;
+import com.netrork.pine.security.userdetails.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,13 +11,12 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 
 @Configuration
 @RequiredArgsConstructor
 public class AppConfig {
 
-    private final OurUserDetailsService ourUserDetailsService;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -28,7 +28,7 @@ public class AppConfig {
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(ourUserDetailsService);
+        daoAuthenticationProvider.setUserDetailsService(userDetailsServiceImpl);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         //return a new UsernamePasswordAuthenticationToken and set it in the SecurityContextHolder
         return daoAuthenticationProvider;
@@ -41,9 +41,5 @@ public class AppConfig {
         return config.getAuthenticationManager();
     }
 
-    @Bean
-    public SecurityContextHolderAwareRequestFilter securityContextHolderAwareRequestFilter() {
-        return new SecurityContextHolderAwareRequestFilter();
-    }
 
 }

@@ -22,7 +22,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "users")
-public class User implements UserDetails{
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -47,10 +47,6 @@ public class User implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
-/*        if (this.role == Role.ADMIN) {
-            return List.of(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("USER"));
-        }
-        return List.of(new SimpleGrantedAuthority("USER"));*/
     }
 
     @Override
@@ -72,4 +68,5 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return true;
     }
+
 }

@@ -3,11 +3,13 @@ package com.netrork.pine.security.configs;
 import com.netrork.pine.security.jwtutils.JwtAccessDeniedHandler;
 import com.netrork.pine.security.jwtutils.JwtAuthenticationEntryPoint;
 import com.netrork.pine.security.jwtutils.JwtAuthenticationFilter;
+//import com.netrork.pine.security.logoututils.CustomLogoutHandler;
 import com.netrork.pine.security.logoututils.CustomLogoutHandler;
-import com.netrork.pine.security.userdetails.OurUserDetailsService;
+import com.netrork.pine.security.userdetails.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -17,6 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -25,7 +28,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurity {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final OurUserDetailsService ourUserDetailsService;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final AuthenticationProvider authenticationProvider;
@@ -42,7 +45,7 @@ public class WebSecurity {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .anyRequest().authenticated())
-                .userDetailsService(ourUserDetailsService)
+                .userDetailsService(userDetailsServiceImpl)
                 .exceptionHandling(exception->exception
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))

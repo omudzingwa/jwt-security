@@ -1,6 +1,6 @@
 package com.netrork.pine.security.jwtutils;
 
-import com.netrork.pine.security.userdetails.OurUserDetailsService;
+import com.netrork.pine.security.userdetails.UserDetailsServiceImpl;
 import com.netrork.pine.security.users.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,7 +25,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final OurUserDetailsService ourUserDetailsService;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final UserRepository userRepository;
 
     @Override
@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
 
-            UserDetails userDetails = ourUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
 
             log.info("is the token valid = "+ jwtTokenProvider.isTokenValid(jwtToken,userDetails));
 
